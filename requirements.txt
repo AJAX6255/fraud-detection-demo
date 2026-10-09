@@ -12,6 +12,7 @@ joblib
 matplotlib
 openai
 google-genai
+google-cloud-storage
 nbformat
 kagglehub
 fastapi>=0.110.0

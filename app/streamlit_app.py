@@ -32,8 +32,11 @@ except Exception:
     pass
 
 from src.features import engineer
+from src.gcs_sync import sync_all_from_gcs
 from src.llm_analyst import generate_report, nl_to_sql
 from src.scorer import load_bundle, score
+
+sync_all_from_gcs()
 
 st.set_page_config(page_title="Fraud Detection AI Demo", page_icon="🛡️", layout="wide")
 

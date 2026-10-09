@@ -45,7 +45,8 @@ gcloud config set project $ProjectId
 Write-Host "==> Enabling required GCP services..." -ForegroundColor Cyan
 gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com
 
-$envPairs = @("SERVICE_MODE=$ServiceMode")
+$BucketName = "fraud-demo-artifacts-623422049137"
+$envPairs = @("SERVICE_MODE=$ServiceMode", "GCS_BUCKET=$BucketName")
 if ($env:LLM_PROVIDER) { $envPairs += "LLM_PROVIDER=$($env:LLM_PROVIDER)" }
 if ($env:GEMINI_API_KEY) { $envPairs += "GEMINI_API_KEY=$($env:GEMINI_API_KEY)" }
 if ($env:OPENAI_API_KEY) { $envPairs += "OPENAI_API_KEY=$($env:OPENAI_API_KEY)" }

@@ -22,6 +22,9 @@ async def lifespan(app: FastAPI):
     app.state.start_time = time.perf_counter()
     print("==> Initializing Fraud Detection Engine services...")
     
+    from src.gcs_sync import sync_all_from_gcs
+    sync_all_from_gcs()
+    
     # 1. Scoring service
     app.state.scoring_service = ScoringService(model_path=settings.model_path)
     
