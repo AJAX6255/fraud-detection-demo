@@ -1,0 +1,14 @@
+# Explicit gcloud upload ignore rules
+# Ensures artifacts/ and data/processed/transactions.parquet ARE included in Cloud Build
+.git
+.gitignore
+__pycache__/
+*.pyc
+data/raw/
+data/*.csv
+data/sample_transactions.csv
+.venv/
+*.zip
+.pytest_cache/
+.streamlit/secrets.toml
+notebooks/.ipynb_checkpoints/
