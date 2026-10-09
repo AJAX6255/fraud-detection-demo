@@ -24,10 +24,11 @@ def score(df, bundle, threshold=None):
     return proba, (proba >= thr).astype(int)
 
 
-def shap_explain(df, bundle, explainer_path="artifacts/shap_explainer.joblib", top_n=6):
+def shap_explain(df, bundle, explainer="artifacts/shap_explainer.joblib", top_n=6):
     """Per-row list of (feature, shap_value, feature_value) for the top drivers."""
     X = _prepare(df, bundle)
-    explainer = joblib.load(explainer_path)
+    if isinstance(explainer, str):
+        explainer = joblib.load(explainer)
     sv = explainer.shap_values(X)
     out = []
     for i in range(len(X)):
