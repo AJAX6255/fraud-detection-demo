@@ -3,6 +3,7 @@ numpy
 scikit-learn
 xgboost>=2.0
 shap
+numba>=0.58.0
 duckdb
 pyarrow
 streamlit>=1.36

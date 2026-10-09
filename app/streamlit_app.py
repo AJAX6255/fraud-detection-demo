@@ -63,7 +63,10 @@ def get_bundle(mtime: float):
 
 @st.cache_resource
 def get_explainer(mtime: float):
-    return joblib.load(EXPLAINER_PATH)
+    try:
+        return joblib.load(EXPLAINER_PATH)
+    except Exception:
+        return None
 
 
 def explain_single(df: pd.DataFrame, bundle: dict, exp, top_n: int = 6):
@@ -110,7 +113,7 @@ def fallback_sql(question: str) -> str:
     return "SELECT * FROM transactions WHERE " + " AND ".join(clauses) + " LIMIT 500"
 
 
-missing = [p for p in (DATA_PATH, MODEL_PATH, EXPLAINER_PATH) if not os.path.exists(p)]
+missing = [p for p in (DATA_PATH, MODEL_PATH) if not os.path.exists(p)]
 if missing:
     st.error("Missing: " + ", ".join(missing) +
              " — run the training pipeline first (see README.md).")
@@ -119,7 +122,6 @@ if missing:
 # Synchronized resource loading based on file modification timestamps
 df = get_data(_mtime(DATA_PATH))
 bundle = get_bundle(_mtime(MODEL_PATH))
-explainer = get_explainer(_mtime(EXPLAINER_PATH))
 
 # Reset feed if model feature set or threshold changed
 if "feed_model_mtime" not in st.session_state or st.session_state.feed_model_mtime != _mtime(MODEL_PATH):
@@ -235,7 +237,8 @@ with tab_inv:
             try:
                 p, _ = score(single, bundle)
                 with st.spinner("LLM analyst writing report…"):
-                    sf = explain_single(single, bundle, explainer, top_n=6)
+                    exp = get_explainer(_mtime(EXPLAINER_PATH))
+                    sf = explain_single(single, bundle, exp, top_n=6) if exp is not None else []
                     report = generate_report(single.iloc[0].to_dict(),
                                              history_summary(df, single.iloc[0]),
                                              sf, float(p[0]))
