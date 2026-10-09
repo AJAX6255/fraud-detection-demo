@@ -9,11 +9,13 @@ import re
 
 import duckdb
 import joblib
+import numpy as np
 import pandas as pd
 import streamlit as st
 
+from src.features import engineer
 from src.llm_analyst import generate_report, nl_to_sql
-from src.scorer import load_bundle, score, shap_explain
+from src.scorer import load_bundle, score
 
 st.set_page_config(page_title="Fraud Detection AI Demo", page_icon="🛡️", layout="wide")
 
@@ -44,6 +46,18 @@ def get_bundle(mtime: float):
 @st.cache_resource
 def get_explainer(mtime: float):
     return joblib.load(EXPLAINER_PATH)
+
+
+def explain_single(df: pd.DataFrame, bundle: dict, exp, top_n: int = 6):
+    """Direct, self-contained SHAP explanation ensuring exact feature alignment."""
+    fe, _ = engineer(df, amt_stats=bundle["amt_stats"], fit=False)
+    for c in bundle["feature_cols"]:
+        if c not in fe.columns:
+            fe[c] = 0
+    X = fe[bundle["feature_cols"]]
+    sv = exp.shap_values(X)
+    order = np.argsort(-np.abs(sv[0]))[:top_n]
+    return [(X.columns[j], float(sv[0][j]), float(X.iloc[0, j])) for j in order]
 
 
 def history_summary(full: pd.DataFrame, tx: pd.Series) -> str:
@@ -203,7 +217,7 @@ with tab_inv:
             try:
                 p, _ = score(single, bundle)
                 with st.spinner("LLM analyst writing report…"):
-                    sf = shap_explain(single, bundle, explainer)[0]
+                    sf = explain_single(single, bundle, explainer, top_n=6)
                     report = generate_report(single.iloc[0].to_dict(),
                                              history_summary(df, single.iloc[0]),
                                              sf, float(p[0]))
