@@ -8,6 +8,9 @@ Provider selection via environment:
 """
 import json
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 SYSTEM_PROMPT = (
     "You are a senior fraud analyst at a card-issuing bank. You explain ML fraud "

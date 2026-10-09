@@ -6,12 +6,24 @@ Cloud Run:     see README.md (Dockerfile included).
 import json
 import os
 import re
+from dotenv import load_dotenv
+
+load_dotenv()
 
 import duckdb
 import joblib
 import numpy as np
 import pandas as pd
 import streamlit as st
+
+# Synchronize st.secrets into environment variables if available
+try:
+    if hasattr(st, "secrets"):
+        for k, v in st.secrets.items():
+            if isinstance(v, str) and k not in os.environ:
+                os.environ[k] = v
+except Exception:
+    pass
 
 from src.features import engineer
 from src.llm_analyst import generate_report, nl_to_sql
