@@ -1,0 +1,11 @@
+.git
+__pycache__
+**/__pycache__
+*.pyc
+data/*.csv
+data/raw/
+notebooks/.ipynb_checkpoints
+.streamlit/secrets.toml
+.venv/
+*.zip
+.pytest_cache/
