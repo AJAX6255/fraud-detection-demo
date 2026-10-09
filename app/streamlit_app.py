@@ -5,8 +5,14 @@ Cloud Run:     see README.md (Dockerfile included).
 """
 import json
 import os
+from pathlib import Path
 import re
+import sys
 from dotenv import load_dotenv
+
+_root = str(Path(__file__).resolve().parent.parent)
+if _root not in sys.path:
+    sys.path.insert(0, _root)
 
 load_dotenv()
 
